@@ -1,0 +1,24 @@
+#This is from kunde21/gitea-arm. I've literally just build an up to date image of gitea and slapped my image on the place of his. I did not do this yml.
+version: "3"
+
+networks:
+  gitea:
+    external: false
+
+services:
+  server:
+    image: starkita/gitea-armhf
+    container_name: gitea
+    environment:
+      - USER_UID=1000
+      - USER_GID=1000
+    restart: always
+    networks:
+      - gitea
+    volumes:
+      - ./gitea:/data
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "3000:3000"
+      - "222:22"
