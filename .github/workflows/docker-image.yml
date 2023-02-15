@@ -1,0 +1,23 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+    env:      
+      DOCKER_REGISTRY: docker.io      
+      DOCKER_IMAGE: starkita/gitea-armhf      
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}  
+      DOCKER_TARGET_PLATFORM: linux/arm/v7  
+  build:
+
+    runs-on: alpine:3.17
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
