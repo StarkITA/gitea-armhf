@@ -16,11 +16,8 @@ RUN apk --no-cache add build-base git nodejs npm
 COPY . ${GOPATH}/src/code.gitea.io/gitea
 WORKDIR ${GOPATH}/src/code.gitea.io/gitea
 
-#Download Gitea
-RUN git clone https://github.com/go-gitea/gitea.git
-
 #Checkout version if set
-RUN if [ -n "${GITEA_VERSION}" ]; then git checkout "${GITEA_VERSION}"; fi \
+RUN if [ -n "${GITEA_VERSION}" ]; then git clone -b "${GITEA_VERSION}" https://github.com/go-gitea/gitea.git; fi \
  && make clean-all build
 
 # Begin env-to-ini build
