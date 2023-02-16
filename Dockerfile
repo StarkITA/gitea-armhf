@@ -17,7 +17,7 @@ COPY . ${GOPATH}/src/code.gitea.io/gitea
 WORKDIR ${GOPATH}/src/code.gitea.io/gitea
 
 #Checkout version if set
-RUN if [ -n "${GITEA_VERSION}" ]; then git checkout "${GITEA_VERSION}"; fi \
+RUN if [ -n "${GITEA_VERSION}" ]; then git clone -b "${GITEA_VERSION}" https://github.com/go-gitea/gitea.git; fi \
  && make clean-all build
 
 # Begin env-to-ini build
