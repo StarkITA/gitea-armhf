@@ -2,9 +2,9 @@ name: Build Gitea
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "workflow-test" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "workflow-test" ]
 
 jobs:
   
