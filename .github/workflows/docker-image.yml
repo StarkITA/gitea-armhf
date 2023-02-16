@@ -7,14 +7,14 @@ on:
     branches: [ "main" ]
 
 jobs:
-  
-  build:
     env:      
       DOCKER_REGISTRY: docker.io      
       DOCKER_IMAGE: starkita/gitea-armhf      
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}  
-      DOCKER_TARGET_PLATFORM: linux/arm/v7
+      DOCKER_TARGET_PLATFORM: linux/arm/v7  
+  build:
+
     runs-on: alpine:3.17
 
     steps:
