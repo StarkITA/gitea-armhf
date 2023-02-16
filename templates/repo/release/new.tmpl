@@ -1,0 +1,149 @@
+{{template "base/head" .}}
+<div role="main" aria-label="{{.Title}}" class="page-content repository new release">
+	{{template "repo/header" .}}
+	<div class="ui container">
+		<h2 class="ui dividing header">
+			{{if .PageIsEditRelease}}
+				{{.locale.Tr "repo.release.edit_release"}}
+				<div class="sub header">{{.locale.Tr "repo.release.edit_subheader"}}</div>
+			{{else}}
+				{{.locale.Tr "repo.release.new_release"}}
+				<div class="sub header">{{.locale.Tr "repo.release.new_subheader"}}</div>
+			{{end}}
+		</h2>
+		{{template "base/alert" .}}
+		<form class="ui form stackable grid" action="{{.Link}}" method="post">
+			{{.CsrfTokenHtml}}
+			<div class="ui seven wide column target">
+				<div class="inline field {{if .Err_TagName}}error{{end}}">
+					{{if .PageIsEditRelease}}
+						<b>{{.tag_name}}</b><span class="at">@</span><strong>{{.tag_target}}</strong>
+					{{else}}
+						<input id="tag-name" name="tag_name" value="{{.tag_name}}" placeholder="{{.locale.Tr "repo.release.tag_name"}}" autofocus required maxlength="255">
+						<span class="at">@</span>
+						<div class="ui selection dropdown">
+							<input type="hidden" name="tag_target" value="{{.tag_target}}"/>
+							{{svg "octicon-git-branch"}}
+							<div class="text">
+								{{.locale.Tr "repo.release.target"}} :
+								<strong id="repo-branch-current">{{.Repository.DefaultBranch}}</strong>
+							</div>
+							{{svg "octicon-triangle-down" 14 "dropdown icon"}}
+							<div class="menu">
+								{{range .Branches}}
+									<div class="item" data-value="{{.}}">{{.}}</div>
+								{{end}}
+							</div>
+						</div>
+						<span class="help">{{.locale.Tr "repo.release.tag_helper"}}</span>
+					{{end}}
+				</div>
+			</div>
+			<div class="eleven wide column">
+				<div class="field {{if .Err_Title}}error{{end}}">
+					<label>{{.locale.Tr "repo.release.title"}}</label>
+					<input name="title" placeholder="{{.locale.Tr "repo.release.title"}}" value="{{.title}}" autofocus required maxlength="255">
+				</div>
+				<div class="field content-editor">
+					<label>{{.locale.Tr "repo.release.content"}}</label>
+					<div class="ui top tabular menu" data-write="write" data-preview="preview">
+						<a class="active write item" data-tab="write">{{$.locale.Tr "write"}}</a>
+						<a class="preview item" data-tab="preview" data-url="{{$.Repository.Link}}/markdown" data-context="{{$.RepoLink}}">{{$.locale.Tr "preview"}}</a>
+					</div>
+					<div class="ui bottom active tab" data-tab="write">
+						<textarea name="content">{{.content}}</textarea>
+					</div>
+					<div class="ui bottom tab markup" data-tab="preview">
+						{{$.locale.Tr "loading"}}
+					</div>
+				</div>
+				{{range .attachments}}
+					<div class="field" id="attachment-{{.ID}}">
+						<div class="ui right gt-df gt-ac wrap_remove">
+							<a class="ui mini compact red button remove-rel-attach" data-id="{{.ID}}" data-uuid="{{.UUID}}">
+								{{$.locale.Tr "remove"}}
+							</a>
+						</div>
+						<div class="gt-df gt-ac">
+							<input name="attachment-edit-{{.UUID}}" class="gt-mr-3 attachment_edit" required value="{{.Name}}"/>
+							<input name="attachment-del-{{.UUID}}" type="hidden" value="false"/>
+							<span class="ui text grey gt-mr-3">{{.Size | FileSize}}</span>
+							<span class="tooltip" data-content="{{$.locale.Tr "repo.release.download_count" (.DownloadCount | PrettyNumber)}}">
+								{{svg "octicon-info"}}
+							</span>
+						</div>
+					</div>
+				{{end}}
+				{{if .IsAttachmentEnabled}}
+					<div class="field">
+						{{template "repo/upload" .}}
+					</div>
+				{{end}}
+			</div>
+			<div class="ui container">
+				<div class="ui divider"></div>
+				<div class="ui text right">
+					{{if not .PageIsEditRelease}}
+						<div class="tag-message field">
+							<div class="ui checkbox">
+								<input type="checkbox" name="add_tag_msg">
+								<label><strong>{{.locale.Tr "repo.release.add_tag_msg"}}</strong></label>
+							</div>
+						</div>
+					{{else}}
+						<input type="hidden" name="add_tag_msg" value="false">
+					{{end}}
+					<div class="prerelease field">
+						<div class="ui checkbox">
+							<input type="checkbox" name="prerelease" {{if .prerelease}}checked{{end}}>
+							<label><strong>{{.locale.Tr "repo.release.prerelease_desc"}}</strong></label>
+						</div>
+					</div>
+					<span class="help">{{.locale.Tr "repo.release.prerelease_helper"}}</span>
+					<div class="field">
+						{{if .PageIsEditRelease}}
+							<a class="ui button" href="{{.RepoLink}}/releases">
+								{{.locale.Tr "repo.release.cancel"}}
+							</a>
+							<a class="ui red button delete-button" data-url="{{$.RepoLink}}/releases/delete" data-id="{{.ID}}">
+								{{$.locale.Tr "repo.release.delete_release"}}
+							</a>
+							{{if .IsDraft}}
+								<input class="ui button" type="submit" name="draft" value="{{.locale.Tr "repo.release.save_draft"}}"/>
+								<button class="ui primary button">
+									{{.locale.Tr "repo.release.publish"}}
+								</button>
+							{{else}}
+								<button class="ui primary button">
+									{{.locale.Tr "repo.release.edit_release"}}
+								</button>
+							{{end}}
+						{{else}}
+							{{if not .tag_name}}
+								<input class="ui grey button" type="submit" name="tag_only" value="{{.locale.Tr "repo.release.add_tag"}}"/>
+							{{end}}
+							<input class="ui button" type="submit" name="draft" value="{{.locale.Tr "repo.release.save_draft"}}"/>
+							<button class="ui primary button">
+								{{.locale.Tr "repo.release.publish"}}
+							</button>
+						{{end}}
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+
+{{if .PageIsEditRelease}}
+	<div class="ui small basic delete modal">
+		<div class="ui icon header">
+			{{svg "octicon-trash"}}
+			{{.locale.Tr "repo.release.deletion"}}
+		</div>
+		<div class="content">
+			<p>{{.locale.Tr "repo.release.deletion_desc"}}</p>
+		</div>
+		{{template "base/delete_modal_actions" .}}
+	</div>
+{{end}}
+{{template "base/footer" .}}
